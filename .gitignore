@@ -57,6 +57,8 @@ target/
 *.bak
 *.tmp
 *.*~
+migrations/
+db.sqlite3
 
 # virtualenv
 restdoc-venv/

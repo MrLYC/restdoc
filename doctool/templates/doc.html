@@ -1,117 +1,88 @@
 {% load doc_tags %}
 <html>
-    <head>
-    </head>
-    <body>
-        <div>
-            {% for model in models %}
-                <div>
-                    <h2>## {% firstof model.description model.name %}管理接口</h2>
-                    <div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>| 字段名 |</th><th> 类型 |</th><th> 含义 |</th>
-                                </tr>
-                                <tr>
-                                    <th>|:-----:|</th><th>:-----:|</th><th>:-----:|</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for field in model.fields %}
-                                    <tr>
-                                        <td>|
-                                            {% if field.pk %}<ins>{% endif %}
-                                            {% if field.required %}<strong>{% endif %}
-                                            {{ field.name }}
-                                            {% if field.required %}</strong>{% endif %}
-                                            {% if field.pk %}</ins>{% endif %}
-                                            |
-                                        </td>
-                                        <td> {{ field.type }} |</td>
-                                        <td> {{ field.description }} |</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% for method in model.methods %}
-                    <div>
-                        {% if method.name == "GET" %}
-                            <h3>### 查找</h3>
-                            {% with demo_data=model.fields|mock_data %}
-                                <p>
-                                    请求：
-                                    <pre>```text
-<code>{{ method.name }} {{ endpoint }}{{ model.name }}?{{ demo_data|to_querystr:model.fields }}</code>
-```</pre>
-                                </p>
-                                <p>
-                                    返回：
-                                    <pre>```text
-<code>{{ demo_data|simple_result:method.name|to_json }}</code>
-```</pre>
-                                </p>
-                            {% endwith %}
-                        {% elif method.name == "POST" %}
-                            <h3>### 创建</h3>
-                            {% with demo_data=model.fields|mock_data %}
-                                <p>
-                                    请求：
-                                    <pre>```text
-<code>{{ method.name }} {{ endpoint }}{{ model.name }}
+<head>
+</head>
+<body>
+<pre>
+{% for model in models %}
+## {% if model.description %} {{ model.description }}（*{{ model.name }}*）{% else %}{{ model.name }}{% endif %}管理接口
+对象字段说明：
+
+| 字段名 | 类型 | 含义 |
+|:------:|:----:|:----:|
+{% for field in model.fields %}| {% if field.pk %}++{% endif %}{% if field.required %}**{% endif %}{{ field.name }}{% if field.required %}**{% endif %}{% if field.pk %}++{% endif %} | {{ field.type }} | {{ field.description }} |
+{% endfor %}
+
+{% for method in model.methods %}
+{% if method.name == "GET" %}
+### 查找
+{% with demo_data=model.fields|mock_data %}
+请求：
+
+```text
+{{ method.name }} {{ endpoint }}{{ model.name|plural }}?{{ demo_data|to_querystr:model.fields }}
+```
+
+返回：
+
+```text
+{{ demo_data|simple_result:method.name|to_json }}
+```
+{% endwith %}
+
+{% elif method.name == "POST" %}
+### 创建
+{% with demo_data=model.fields|mock_data %}
+请求：
+
+```text
+{{ method.name }} {{ endpoint }}{{ model.name|plural }}
 
 {{ demo_data|pickup_required:model.fields|to_json }}
-</code>
-```</pre>
-                                </p>
-                                <p>
-                                    返回：
-                                    <pre>```text
-<code>{{ demo_data|pickup_pk:model.fields|simple_result:method.name|to_json }}</code>
-```</pre>
-                                </p>
-                            {% endwith %}
-                        {% elif method.name == "PUT" %}
-                            <h3>### 更新</h3>
-                            {% with demo_data=model.fields|mock_data %}
-                                <p>
-                                    请求：
-                                    <pre>```text
-<code>{{ method.name }} {{ endpoint }}{{ model.name }}
+```
+
+返回：
+
+```text
+{{ demo_data|pickup_pk:model.fields|simple_result:method.name|to_json }}
+```
+{% endwith %}
+
+{% elif method.name == "PUT" %}
+### 更新
+{% with demo_data=model.fields|mock_data %}
+请求：
+
+```text
+{{ method.name }} {{ endpoint }}{{ model.name|plural }}?{{ demo_data|to_querystr:model.fields }}
 
 {{ demo_data|pickup_required:model.fields|to_json }}
-</code>
-```</pre>
-                                </p>
-                                <p>
-                                    返回：
-                                    <pre>```text
-<code>{{ demo_data|pickup_pk:model.fields|simple_result:method.name|to_json }}</code>
-```</pre>
-                                </p>
-                            {% endwith %}
-                        {% elif method.name == "DELETE" %}
-                            <h3>### 删除</h3>
-                            {% with demo_data=model.fields|mock_data %}
-                                <p>
-                                    请求：
-                                    <pre>```text
-<code>{{ method.name }} {{ endpoint }}{{ model.name }}?{{ demo_data|to_querystr:model.fields }}</code>
-```</pre>
-                                </p>
-                                <p>
-                                    返回：
-                                    <pre>```text
-<code>{{ demo_data|pickup_pk:model.fields|simple_result:method.name|to_json }}</code>
-```</pre>
-                                </p>
-                            {% endwith %}
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
-            {% endfor %}
-        </div>
-    </body>
+```
+
+返回：
+```text
+{{ demo_data|pickup_pk:model.fields|simple_result:method.name|to_json }}
+```
+{% endwith %}
+
+{% elif method.name == "DELETE" %}
+### 删除
+{% with demo_data=model.fields|mock_data %}
+请求：
+
+```text
+{{ method.name }} {{ endpoint }}{{ model.name|plural }}?{{ demo_data|to_querystr:model.fields }}
+```
+
+返回：
+```text
+{{ demo_data|pickup_pk:model.fields|simple_result:method.name|to_json }}
+```
+{% endwith %}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+</pre>
+</body>
 </html>

@@ -6,6 +6,7 @@ import datetime
 import random
 import json
 import urllib
+import re
 
 from django import template
 
@@ -66,7 +67,35 @@ def to_json(value):
 @register.filter(name="simple_result")
 def simple_result(value, method):
     return {
-        "code": 200,
+        "ret_code": 200,
         "message": "ok",
         "result": [value] if method in ["GET", "DELETE"] else value
     }
+
+
+class Plural(object):
+    def GetMatchAndApplyFuncs(strPattern, strSearch, strReplace):
+        def MatchRule(strWord):
+            return re.search(strPattern, strWord)
+
+        def ApplyRule(strWord):
+            return re.sub(strSearch, strReplace, strWord)
+
+        return (MatchRule, ApplyRule)
+
+    g_tlPattern = (
+        ('[sxz]$', '$', 'es'),
+        ('[^aeioudgkprt]h$', '$', 'es'),
+        ('(qu|[^aeiou])y$', 'y$', 'ies'),
+        ('$', '$', 's'),
+    )
+    g_lsRules = [GetMatchAndApplyFuncs(strPattern, strSearch, strReplace) for (strPattern, strSearch, strReplace) in g_tlPattern]
+
+    @register.filter(name="plural")
+    def GetPlural(strWord):
+        if not strWord:
+            return ""
+
+        for fnMatch, fnApply in Plural.g_lsRules:
+            if fnMatch(strWord):
+                return fnApply(strWord)

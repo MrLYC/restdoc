@@ -12,6 +12,7 @@
 {% for field in model.fields %}| {% if field.pk %}++{% endif %}{% if field.required %}**{% endif %}{{ field.name }}{% if field.required %}**{% endif %}{% if field.pk %}++{% endif %} | {{ field.type }} | {{ field.description }} |
 {% endfor %}
 
+
 {% for method in model.methods %}
 {% if method.name == "GET" %}
 ### 查找

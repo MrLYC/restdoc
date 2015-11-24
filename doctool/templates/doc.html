@@ -9,7 +9,7 @@
 
 | 字段名 | 类型 | 含义 |
 |:------:|:----:|:----:|
-{% for field in model.fields %}| {% if field.pk %}++{% endif %}{% if field.required %}**{% endif %}{{ field.name }}{% if field.required %}**{% endif %}{% if field.pk %}++{% endif %} | {{ field.type }} | {{ field.description }} |
+{% for field in model.fields %}| {% if field.name|is_pk_field:model %}++{% endif %}{% if field.name|is_required_field:model %}**{% endif %}{{ field.name }}{% if field.name|is_required_field:model %}**{% endif %}{% if field.name|is_pk_field:model %}++{% endif %} | {{ field.type }} | {{ field.description }} |
 {% endfor %}
 
 

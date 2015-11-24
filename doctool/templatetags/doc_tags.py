@@ -18,8 +18,8 @@ def mock_data(fields):
     result = {}
     for f in fields:
         fname = f["name"]
-        fval = f.get("default")
-        if fval:
+        fval = f.get("default", NotImplemented)
+        if fval is not NotImplemented:
             result[fname] = fval
             continue
 
@@ -39,7 +39,15 @@ def mock_data(fields):
             result[fname] = datetime.datetime.today().isoformat()
         elif ftype == "boolean":
             result[fname] = [True, False][f_id % 2]
+        elif ftype.endswith("list"):
+            result[fname] = []
     return result
+
+
+@register.filter(name="is_required_field")
+def is_required_field(field, model):
+    required_fields = set(model.get("required", ()))
+    return field in required_fields
 
 
 @register.filter(name="pickup_required")
@@ -50,6 +58,12 @@ def pickup_required(value, model):
         for f in model["fields"]
         if f["name"] in required_fields
     }
+
+
+@register.filter(name="is_pk_field")
+def is_pk_field(field, model):
+    pk_fields = set(model.get("pk", ()))
+    return field in pk_fields
 
 
 @register.filter(name="pickup_pk")

@@ -18,14 +18,19 @@ def mock_data(fields):
     result = {}
     for f in fields:
         fname = f["name"]
-        ftype = f["type"]
+        fval = f.get("default")
+        if fval:
+            result[fname] = fval
+            continue
+
+        ftype = f.get("type", "string")
         f_id = abs(id(f))
         if ftype == "string":
             result[fname] = uuid.uuid3(uuid.NAMESPACE_OID, str(f_id)).get_hex()[:8]
         elif ftype == "integer":
             result[fname] = f_id % 100
         elif ftype == "float":
-            result[fname] = f_id / 1.0
+            result[fname] = f_id % 100 / 1.0
         elif ftype == "uuid":
             result[fname] = uuid.uuid3(uuid.NAMESPACE_OID, str(f_id)).get_hex()
         elif ftype == "date":
@@ -38,26 +43,28 @@ def mock_data(fields):
 
 
 @register.filter(name="pickup_required")
-def pickup_required(value, fields):
+def pickup_required(value, model):
+    required_fields = set(model.get("required", ()))
     return {
-        f["name"]: value[f["name"]]
-        for f in fields
-        if f.get("required") is True
+        f["name"]: value.get(f["name"])
+        for f in model["fields"]
+        if f["name"] in required_fields
     }
 
 
 @register.filter(name="pickup_pk")
-def pickup_pk(value, fields):
+def pickup_pk(value, model):
+    pk_fields = set(model.get("pk", ()))
     return {
-        f["name"]: value[f["name"]]
-        for f in fields
-        if f.get("pk") is True
+        f["name"]: value.get(f["name"])
+        for f in model["fields"]
+        if f["name"] in pk_fields
     }
 
 
 @register.filter(name="to_querystr")
-def to_querystr(value, fields):
-    return urllib.urlencode(pickup_pk(value, fields))
+def to_querystr(value, model):
+    return urllib.urlencode(pickup_pk(value, model))
 
 
 @register.filter(name="to_json")

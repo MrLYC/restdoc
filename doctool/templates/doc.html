@@ -6,7 +6,6 @@
 <pre>
 {% for model in models %}
 ## {% if model.description %} {{ model.description }}（*{{ model.name }}*）{% else %}{{ model.name }}{% endif %}管理接口
-对象字段说明：
 
 | 字段名 | 类型 | 含义 |
 |:------:|:----:|:----:|
@@ -20,7 +19,7 @@
 请求：
 
 ```text
-{{ method.name }} {{ endpoint }}{{ model.name|plural }}?{{ demo_data|to_querystr:model.fields }}
+{{ method.name }} {{ endpoint }}{{ model.name|plural }}?{{ demo_data|to_querystr:model }}
 ```
 
 返回：
@@ -38,13 +37,13 @@
 ```text
 {{ method.name }} {{ endpoint }}{{ model.name|plural }}
 
-{{ demo_data|pickup_required:model.fields|to_json }}
+{{ demo_data|pickup_required:model|to_json }}
 ```
 
 返回：
 
 ```text
-{{ demo_data|pickup_pk:model.fields|simple_result:method.name|to_json }}
+{{ demo_data|pickup_pk:model|simple_result:method.name|to_json }}
 ```
 {% endwith %}
 
@@ -54,14 +53,14 @@
 请求：
 
 ```text
-{{ method.name }} {{ endpoint }}{{ model.name|plural }}?{{ demo_data|to_querystr:model.fields }}
+{{ method.name }} {{ endpoint }}{{ model.name|plural }}?{{ demo_data|to_querystr:model }}
 
-{{ demo_data|pickup_required:model.fields|to_json }}
+{{ demo_data|pickup_required:model|to_json }}
 ```
 
 返回：
 ```text
-{{ demo_data|pickup_pk:model.fields|simple_result:method.name|to_json }}
+{{ demo_data|pickup_pk:model|simple_result:method.name|to_json }}
 ```
 {% endwith %}
 
@@ -71,12 +70,12 @@
 请求：
 
 ```text
-{{ method.name }} {{ endpoint }}{{ model.name|plural }}?{{ demo_data|to_querystr:model.fields }}
+{{ method.name }} {{ endpoint }}{{ model.name|plural }}?{{ demo_data|to_querystr:model }}
 ```
 
 返回：
 ```text
-{{ demo_data|pickup_pk:model.fields|simple_result:method.name|to_json }}
+{{ demo_data|pickup_pk:model|simple_result:method.name|to_json }}
 ```
 {% endwith %}
 {% endif %}

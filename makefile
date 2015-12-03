@@ -4,7 +4,7 @@ DEVMKFILE := $(DEVPATH)/makefile
 SRCPATH := $(ROOTPATH)/restdoc
 
 # ENV VARS
-PYENV := env PYTHONPATH=$(SRCPATH)
+PYENV := env PYTHONPATH=$(ROOTPATH) DJANGO_SETTINGS_MODULE=restdoc.settings
 PYTHON := $(PYENV) python
 PEP8 := $(PYENV) pep8 --repeat --ignore=E202,E501
 PYLINT := $(PYENV) pylint --disable=I0011 --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
@@ -38,6 +38,9 @@ test: pylint
 
 requires: $(ROOTPATH)/requirements.txt
 	$(PIPINSTALL) -r $(ROOTPATH)/requirements.txt
+
+runserver:
+	$(PYTHON) manage.py runserver 0:9474
 
 author-config:
 	git config user.email imyikong@gmail.com --local
